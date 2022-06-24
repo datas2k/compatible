@@ -55,7 +55,7 @@ const images3 = [
                   './media/3/ZStdDkv.jpg'
 ];
 
-const images = [images1,images2,images3];
+const images = [images1,images2,images3,images3,images2,images3,images1,images2,images1];
 
 class Carousel {
   constructor(carousel,speed,images) {
@@ -190,7 +190,7 @@ class Carousel {
 
 
 }
-let speeds = [0.2,1,3]
+let speeds = [0.2,1,3, 0.8,1,2, 1,6,1.5]
 window.addEventListener('load', ()=> {
   let carousels = Array.from(document.getElementsByClassName('carousel'));
   for (let i = 0; i < carousels.length; i++) {
