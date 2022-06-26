@@ -56,18 +56,50 @@ const images3 = [
 ];
 
 
-class Carousel {
+class CarouselCTRL {
+  constructor(carousel,container) {
+    this.control = document.createElement('div');
+    this.control.style.position = 'absolute';
+    this.control.style.display = "flex";
+    this.control.style.flexFlow = "row";
+    this.control.style.justifyContent = "center";
+    this.control.style.alignItems = "center";
+    this.control.style.width = `100%`;
+    this.control.style.height = `100%`;
+    this.control.style.backgroundColor = "transparent";
+    this.control.style.zIndex = 100;
+    this.controlPrev = document.createElement('div');
+    this.controlCover = document.createElement('div');
+    this.controlNext = document.createElement('div');
+    this.controls = [this.controlPrev,this.controlCover,this.controlNext]
+    this.controls.forEach(e => {
+      e.style.height = '100%';
+      e.style.backgroundColor = 'red';
+      e.style.width = '1em';
+      e.style.zIndex = 110;
+      e.style.border = "2px solid pink";
+      this.control.appendChild(e);
+    });
+    this.controlCover.style.flex = 'auto';
+    this.controlCover.style.backgroundColor = 'transparent';
+    this.controlPrev.addEventListener('click', ()=> {
+      carousel.animation('left','click');
+    },false);
+    this.controlNext.addEventListener('click', ()=> {
+      carousel.animation('right','click');
+    },false);
+    container.appendChild(this.control);
+  };
+};
+
+class Carousel_CSS {
   constructor(carousel,speed,images) {
-    // this.fxs = fxs;
-    // this.fxState = true;
-    // this.fxCounter = 0;
-    this.dir = '100%';
+    this.offset = '100%';
     this.translationComplete = true;
-    // this.wrapper = document.getElementsByClassName('wrapper')[0];
-    // this.wrapperH = this.wrapper.clientHeight;
     this.speed = speed;
     this.images = images;
     this.index = 0;
+    this.id = carousel.id;
     carousel.style.position = 'relative';
     carousel.style.display = "flex";
     carousel.style.flexFlow = "column";
@@ -77,8 +109,6 @@ class Carousel {
     carousel.style.width = `100%`;
     carousel.style.height = `100%`;
     carousel.style.zIndex = 0;
-    carousel.style.border = "1px solid black";
-    
     this.slidesContainer = document.createElement('div');
     this.slidesContainer.className = 'slides-container';
     this.slidesContainer.style.position = 'relative';
@@ -91,39 +121,6 @@ class Carousel {
     this.slidesContainer.style.height = `100%`;
     this.slidesContainer.style.zIndex = 1;
     carousel.appendChild(this.slidesContainer);
-    
-    this.control = document.createElement('div');
-    this.control.style.position = 'absolute';
-    this.control.style.display = "flex";
-    this.control.style.flexFlow = "row";
-    this.control.style.justifyContent = "center";
-    this.control.style.alignItems = "center";
-    this.control.style.width = `100%`;
-    this.control.style.height = `100%`;
-    this.control.style.backgroundColor = "transparent";
-    this.control.style.zIndex = 10;
-    this.controlPrev = document.createElement('div');
-    this.controlCover = document.createElement('div');
-    this.controlNext = document.createElement('div');
-    this.controls = [this.controlPrev,this.controlCover,this.controlNext]
-    this.controls.forEach(e => {
-      e.style.height = '100%';
-      e.style.backgroundColor = 'red';
-      e.style.width = '1em';
-      e.style.zIndex = 100;
-      e.style.border = "2px solid cyan";
-      this.control.appendChild(e);
-    });
-    this.controlCover.style.flex = 'auto';
-    this.controlCover.style.backgroundColor = 'transparent';
-    this.controlPrev.addEventListener('click', ()=> {
-      this.animation('left','click');
-    },false);
-    this.controlNext.addEventListener('click', ()=> {
-      this.animation('right','click');
-    },false);
-    carousel.appendChild(this.control);
-    
     this.slides = [];
     this.img = [];
     for (let i = 0; i < 3; i++) {
@@ -134,46 +131,23 @@ class Carousel {
       this.slides[i].style.height = `100%`;
       this.slides[i].style.zIndex = 2;
       this.slides[i].addEventListener("transitionend", this.transitionCompleted, false);                    
-      
-
       this.img[i] = document.createElement('img');
       this.img[i].style.position = 'relative';
       this.img[i].style.width = `100%`;
       this.img[i].style.height = `100%`;
       this.img[i].style.zIndex = 0;
-      this.img[i].style.objectFit = 'fill';                         // !!!!!!!!!!!!!
+      this.img[i].style.objectFit = 'fill'; // need to rework for better visual
       this.img[i].style.zIndex = 3;
-            
       this.slides[i].appendChild(this.img[i]);
       this.slidesContainer.appendChild(this.slides[i]);
     };
-  
-    let t = this;
-    let slider = setInterval(function(){t.slider();}, t.speed * 1000  );
-    //let fx = setInterval(function(){t.fx();}, t.speed * 120 );
+    setInterval(()=>{this.slider();}, this.speed * 1000);
   };
 
 
   transitionCompleted() {
-    console.log('COMPL!')
     this.translationComplete = true;
   }
-  
-  fx() {
-    let height = this.wrapper.style.height;
-    let clientHeight= this.wrapper.clientHeight;
-    if (this.fxCounter > this.fxs.length-1) {
-      this.fxCounter = 0;
-      this.fxState = !this.fxState;
-    }
-     if (this.fxState) {
-      this.wrapper.style.height = `${this.wrapper.clientHeight - (this.wrapper.clientHeight * (0.01 * this.fxs[this.fxCounter]))}px`;
-    } else {
-      this.wrapper.style.height = `${this.wrapper.clientHeight + (this.wrapper.clientHeight * (0.01 * this.fxs[this.fxCounter]))}px`;
-    }
-    this.fxCounter++;
-  }
-
   slider() {
     this.animation('right','slide');
   };
@@ -183,56 +157,48 @@ class Carousel {
     if (this.index <= 0) {
       indexLeft = (this.images.length-1)-(Math.abs(this.index));
     } else {
-      indexLeft = this.index-1;
-    }
+      indexLeft = this.index - 1;
+    };
     if (this.index < 0) {
-      this.index = this.images.length-1;
-    }
-    if (this.index > this.images.length-1) {
+      this.index = this.images.length - 1;
+    };
+    if (this.index > this.images.length - 1) {
       this.index = 0;
-    }
-    if (this.index >= this.images.length-1) {
-      indexRight = this.index - (this.images.length-1);
+    };
+    if (this.index >= this.images.length - 1) {
+      indexRight = this.index - (this.images.length - 1);
     } else {
       indexRight = this.index + 1;
-    }
+    };
     let indexes = [indexLeft,this.index,indexRight];
     for (let i = 0; i < indexes.length; i++) {
       this.img[i].src = `${this.images[indexes[i]]}`;
-    }
-  }
-  
-
+    };
+  };
   animation(direction,input) {
-    
     if (input == 'click') {
       switch (direction) {
         case 'left':
-          this.dir = '-100%';
+          this.offset = '-100%';
           break;
         case 'right':
-          this.dir = '100%';
+          this.offset = '100%';
           break;
       };  
     };
-    
-
     if (this.translationComplete) {
       this.translationComplete = false;
-    
-      switch (this.dir) {
+      switch (this.offset) {
         case '-100%':
           this.index++;  
           break;
         case '100%':
           this.index--;  
           break;
-      }
-      
-    
+      };
       this.slides.forEach(e => {
         e.style.transition = `transform ${this.speed}s ease`;
-        e.style.transform = `translateX(${this.dir})`;  
+        e.style.transform = `translateX(${this.offset})`;  
       });  
       setTimeout( ()=> {
         this.copy();
@@ -243,23 +209,31 @@ class Carousel {
         });
       }, this.speed * 1000);
     };
-    
   };
+};
 
-  anim_slide() {
-  }
-
-}
-
-const images = [images3,images2,images3,images3,images2,images3,images1,images2,images1];
+const images = [images1,images2,images3,images3,images2,images3,images1,images2,images1];
 const fxs = [1,2,3,1,2,3];    
 let speeds = [1,0.7,0.9,1.1];
 window.addEventListener('load', ()=> {
   let carousels = Array.from(document.getElementsByClassName('carousel'));
+  let controls = Array.from(document.getElementsByClassName('carousel-CTRL'));
   for (let i = 0; i < carousels.length; i++) {
-    carousels[i] = new Carousel(carousels[i],speeds[i],images[i]);
+    carousels[i] = new Carousel_CSS(carousels[i],speeds[i],images[i]);
     carousels[i].copy();
+  };
+  for (let i = 0; i < controls.length; i++) {
+    let parent = controls[i].parentElement;
+    let carouselID =  controls[i].getAttribute("data-carousel");
+    console.log(carouselID);
+    carousels.forEach(e => {
+      if (e.id == carouselID) {
+        controls[i] = new CarouselCTRL(e,parent);    
+      }
+    });
+    
   }
+
 });
 
 
