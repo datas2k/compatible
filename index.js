@@ -55,10 +55,16 @@ const images3 = [
                   './media/3/ZStdDkv.jpg'
 ];
 
-const images = [images1,images2,images3,images3,images2,images3,images1,images2,images1];
 
 class Carousel {
   constructor(carousel,speed,images) {
+    // this.fxs = fxs;
+    // this.fxState = true;
+    // this.fxCounter = 0;
+    this.dir = '100%';
+    this.translationComplete = true;
+    // this.wrapper = document.getElementsByClassName('wrapper')[0];
+    // this.wrapperH = this.wrapper.clientHeight;
     this.speed = speed;
     this.images = images;
     this.index = 0;
@@ -93,7 +99,7 @@ class Carousel {
     this.control.style.justifyContent = "center";
     this.control.style.alignItems = "center";
     this.control.style.width = `100%`;
-    this.control.style.height = `calc(100%)`;
+    this.control.style.height = `100%`;
     this.control.style.backgroundColor = "transparent";
     this.control.style.zIndex = 10;
     this.controlPrev = document.createElement('div');
@@ -102,17 +108,19 @@ class Carousel {
     this.controls = [this.controlPrev,this.controlCover,this.controlNext]
     this.controls.forEach(e => {
       e.style.height = '100%';
-      e.style.backgroundColor = 'transparent';
+      e.style.backgroundColor = 'red';
       e.style.width = '1em';
+      e.style.zIndex = 100;
       e.style.border = "2px solid cyan";
       this.control.appendChild(e);
     });
     this.controlCover.style.flex = 'auto';
+    this.controlCover.style.backgroundColor = 'transparent';
     this.controlPrev.addEventListener('click', ()=> {
-      this.animation('left');
+      this.animation('left','click');
     },false);
     this.controlNext.addEventListener('click', ()=> {
-      this.animation('right');
+      this.animation('right','click');
     },false);
     carousel.appendChild(this.control);
     
@@ -125,6 +133,9 @@ class Carousel {
       this.slides[i].style.width = `100%`;
       this.slides[i].style.height = `100%`;
       this.slides[i].style.zIndex = 2;
+      this.slides[i].addEventListener("transitionend", this.transitionCompleted, false);                    
+      
+
       this.img[i] = document.createElement('img');
       this.img[i].style.position = 'relative';
       this.img[i].style.width = `100%`;
@@ -136,8 +147,37 @@ class Carousel {
       this.slides[i].appendChild(this.img[i]);
       this.slidesContainer.appendChild(this.slides[i]);
     };
-   
+  
+    let t = this;
+    let slider = setInterval(function(){t.slider();}, t.speed * 1000  );
+    //let fx = setInterval(function(){t.fx();}, t.speed * 120 );
   };
+
+
+  transitionCompleted() {
+    console.log('COMPL!')
+    this.translationComplete = true;
+  }
+  
+  fx() {
+    let height = this.wrapper.style.height;
+    let clientHeight= this.wrapper.clientHeight;
+    if (this.fxCounter > this.fxs.length-1) {
+      this.fxCounter = 0;
+      this.fxState = !this.fxState;
+    }
+     if (this.fxState) {
+      this.wrapper.style.height = `${this.wrapper.clientHeight - (this.wrapper.clientHeight * (0.01 * this.fxs[this.fxCounter]))}px`;
+    } else {
+      this.wrapper.style.height = `${this.wrapper.clientHeight + (this.wrapper.clientHeight * (0.01 * this.fxs[this.fxCounter]))}px`;
+    }
+    this.fxCounter++;
+  }
+
+  slider() {
+    this.animation('right','slide');
+  };
+  
   copy() {
     let indexLeft,indexRight;
     if (this.index <= 0) {
@@ -162,35 +202,58 @@ class Carousel {
     }
   }
   
-  animation(direction) {
-    let dir;
-    switch (direction) {
-      case 'left':
-        this.index++;  
-        dir = '-100%'  
-        break;
-      case 'right':
-        this.index--;  
-        dir = '100%'  
-        break;
-    }
-    this.slides.forEach(e => {
-      e.style.transition = `transform ${this.speed}s linear`;
-      e.style.transform = `translateX(${dir})`;  
-    });
-    setTimeout( ()=> {
-      this.copy();
+
+  animation(direction,input) {
+    
+    if (input == 'click') {
+      switch (direction) {
+        case 'left':
+          this.dir = '-100%';
+          break;
+        case 'right':
+          this.dir = '100%';
+          break;
+      };  
+    };
+    
+
+    if (this.translationComplete) {
+      this.translationComplete = false;
+    
+      switch (this.dir) {
+        case '-100%':
+          this.index++;  
+          break;
+        case '100%':
+          this.index--;  
+          break;
+      }
+      
+    
       this.slides.forEach(e => {
-        e.style.transition = "transform 0s linear";
-        e.style.transform = `translateX(0)`;  
-      });
-    }, this.speed * 1000);
+        e.style.transition = `transform ${this.speed}s ease`;
+        e.style.transform = `translateX(${this.dir})`;  
+      });  
+      setTimeout( ()=> {
+        this.copy();
+        this.slides.forEach(e => {
+          e.style.transition = "transform 0s linear";
+          e.style.transform = `translateX(0)`;
+          this.translationComplete = true;  
+        });
+      }, this.speed * 1000);
+    };
+    
   };
 
-
+  anim_slide() {
+  }
 
 }
-let speeds = [0.2,1,3, 0.8,1,2, 1,6,1.5]
+
+const images = [images3,images2,images3,images3,images2,images3,images1,images2,images1];
+const fxs = [1,2,3,1,2,3];    
+let speeds = [1,0.7,0.9,1.1];
 window.addEventListener('load', ()=> {
   let carousels = Array.from(document.getElementsByClassName('carousel'));
   for (let i = 0; i < carousels.length; i++) {
