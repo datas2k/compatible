@@ -62,26 +62,44 @@ class CarouselCTRL {
     this.control.style.position = 'absolute';
     this.control.style.display = "flex";
     this.control.style.flexFlow = "row";
-    this.control.style.justifyContent = "center";
+    this.control.style.justifyContent = "space-between";
     this.control.style.alignItems = "center";
     this.control.style.width = `100%`;
     this.control.style.height = `100%`;
     this.control.style.backgroundColor = "transparent";
     this.control.style.zIndex = 100;
     this.controlPrev = document.createElement('div');
-    this.controlCover = document.createElement('div');
     this.controlNext = document.createElement('div');
-    this.controls = [this.controlPrev,this.controlCover,this.controlNext]
+
+    //this.controlCover = document.createElement('div');
+    
+    this.controls = [this.controlPrev,this.controlNext]; //,this.controlCover
     this.controls.forEach(e => {
       e.style.height = '100%';
-      e.style.backgroundColor = 'red';
-      e.style.width = '1em';
+      e.style.display = "flex";
+      e.style.flexFlow = "column";
+      e.style.justifyContent = "center";
+      e.style.alignItems = "center";
+      e.style.width = 'fit-content';
+      e.style.padding = '0.5em';
+      e.style.fontSize = '2em';
+      e.style.fontFamily = 'impact';
       e.style.zIndex = 110;
-      e.style.border = "2px solid pink";
+      e.style.color = 'white';
+      e.style.textShadow = "3px 3px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000";
       this.control.appendChild(e);
     });
-    this.controlCover.style.flex = 'auto';
-    this.controlCover.style.backgroundColor = 'transparent';
+    this.controlPrev.textContent = "<";
+    this.controlNext.textContent = ">";
+    
+    for (let i = 0; i < 2; i++) {
+      this.controls[i].style.cursor = "pointer";
+    }
+ 
+
+    //this.controlCover.style.flex = 'auto';
+    //this.controlCover.style.backgroundColor = 'transparent';
+    
     this.controlPrev.addEventListener('click', ()=> {
       carousel.animation('left','click');
     },false);

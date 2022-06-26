@@ -20,13 +20,33 @@ html, body {
   height: 75%;
   display: flex;
   flex-flow: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.nav {
+  position: relative;
+  background-color: aqua;
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  height: fit-content;
+}
+
+.nav ul {
+  list-style: none;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.nav ul li {
+  margin-right: 1em;
+  background-color: brown;
 }
 
 
-.container1 {
-  position: relative;
+.carousel-container1 {
+  position: absolute;
   width: 100%;
   height: 100%;
   display: flex;
@@ -34,14 +54,13 @@ html, body {
   justify-content: center;
   align-items: center;
   z-index: 0;
+  border: 2px solid black;
 }
 
-.container2 {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  top: 50%;
-  right: 1em;
+.carousel-CTRL-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-flow: column;
   justify-content: center;
